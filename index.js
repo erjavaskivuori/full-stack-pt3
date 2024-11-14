@@ -39,36 +39,28 @@ personSchema.set('toJSON', {
 const Person = mongoose.model('Person', personSchema);
 
 app.post('/api/persons', (request, response) => {
-  const body = request.body;
-  const notUnique = persons.find((person) => person.name === body.name);
-  if (!body.name) {
-    return response.status(400).json({
-      error: 'name is missing',
-    });
-  } else if (notUnique) {
-    return response.status(400).json({
-      error: 'name must be unique',
-    });
-  } else if (!body.number) {
-    return response.status(400).json({
-      error: 'number is missing',
-    });
+  const body = request.body
+
+  if (body.name === undefined) {
+    return response.status(400).json({ error: 'name missing' })
   }
 
-  const id = Math.floor(Math.random() * 10000);
+  if (body.number === undefined) {
+    return response.status(400).json({ error: 'number missing' })
+  }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: String(id),
-  };
+  })
 
-  persons = persons.concat(person);
-  response.json(person);
-});
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
+})
 
-app.get('/info', (request, response) => {
-  const count = persons.length;
+app.get('/api/info', async (request, response) => {
+  const count = await Person.countDocuments({});
   const date = new Date();
 
   response.send(`<p>Phonebook has info for ${count} people<br>${date}</p>`);
@@ -81,21 +73,15 @@ app.get('/api/persons', (request, response) => {
 });
 
 app.get('/api/persons/:id', (request, response) => {
+  Person.findById(request.params.id).then(person => {
+    response.json(person)
+  })
+})
+
+app.delete('/api/persons/:id', async (request, response) => {
   const id = request.params.id;
-  const person = Person.find({ id: id });
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
-});
-
-app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id;
-  persons = persons.filter((person) => person.id !== id);
-
-  response.status(204).end();
+  await Person.findByIdAndDelete(id);
+    response.status(204).end();
 });
 
 const PORT = process.env.PORT || 3001;
