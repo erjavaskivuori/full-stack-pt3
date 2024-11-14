@@ -2,10 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const cors = require('cors');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-
-dotenv.config();
+const Person = require('./models/person')
 
 morgan.token('data', function (request, response) {
   const person = request.body;
@@ -17,26 +14,6 @@ app.use(
 );
 app.use(cors());
 app.use(express.static('dist'));
-
-const url = `mongodb+srv://erjavaskivuori:${process.env.DB_PSW}@cluster0.wo9vfzy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
-mongoose.set('strictQuery', false);
-mongoose.connect(url);
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
-
-const Person = mongoose.model('Person', personSchema);
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
