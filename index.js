@@ -16,17 +16,17 @@ const requestLogger = (request, response, next) => {
 };
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
+  console.error(error.message);
 
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+    return response.status(400).send({ error: 'malformatted id' });
 
   } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message });
   }
 
-  next(error)
-}
+  next(error);
+};
 
 morgan.token('data', function (request, response) {
   const person = request.body;
@@ -105,7 +105,7 @@ app.put('/api/persons/:id', (request, response, next) => {
       response.json(updatedPerson);
     })
     .catch(error => next(error));
-})
+});
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
