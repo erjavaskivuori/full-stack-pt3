@@ -1,12 +1,11 @@
 import globals from "globals";
-import js from '@eslint/js';
-import stylisticJs from '@stylistic/eslint-plugin-js';
+import stylisticJs from '@stylistic/eslint-plugin-js'
+import js from '@eslint/js'
 
 export default [
   js.configs.recommended,
   {
     files: ["**/*.js"],
-    ignores: ["dist/**"],
     languageOptions: {
       sourceType: "commonjs",
       globals: {
@@ -32,8 +31,20 @@ export default [
       ],
       '@stylistic/js/semi': [
         'error',
-        'never'
+        'always'
       ],
+      'eqeqeq': 'error',
+      'no-trailing-spaces': 'error',
+      'object-curly-spacing': [
+        'error', 'always'
+      ],
+      'arrow-spacing': [
+        'error', { 'before': true, 'after': true },
+      ],
+      'no-console': 'off',
     },
-  }
-];
+  },
+  { 
+    ignores: ["dist/**", "build/**"],
+  },
+]
